@@ -4,7 +4,6 @@ import testRenderer from 'react-test-renderer';
 import {
     beginCheckout,
     cancelCheckout,
-    editOrder,
     submitShippingAddress,
     submitOrder,
     submitPaymentMethodAndBillingAddress,
@@ -39,7 +38,6 @@ const defaultProps = {
     },
     beginCheckout,
     cancelCheckout,
-    editOrder,
     submitShippingAddress,
     submitOrder,
     submitPaymentMethodAndBillingAddress,
@@ -52,7 +50,6 @@ test('returns a connected CheckoutContainer component', () => {
     expect(ConnectedCheckoutContainer.mapDispatchToProps).toMatchObject({
         beginCheckout,
         cancelCheckout,
-        editOrder,
         submitShippingAddress,
         submitOrder,
         submitPaymentMethodAndBillingAddress,

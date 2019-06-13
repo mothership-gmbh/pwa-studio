@@ -5,7 +5,6 @@ import { array, bool, func, object, oneOf, shape, string } from 'prop-types';
 import {
     beginCheckout,
     cancelCheckout,
-    editOrder,
     submitShippingAddress,
     submitOrder,
     submitPaymentMethodAndBillingAddress,
@@ -38,7 +37,6 @@ export const CheckoutContainer = props => {
         cart,
         checkout,
         directory,
-        editOrder,
         requestOrder,
         submitShippingAddress,
         submitOrder,
@@ -55,7 +53,6 @@ export const CheckoutContainer = props => {
     const actions = {
         beginCheckout,
         cancelCheckout,
-        editOrder,
         requestOrder,
         submitShippingAddress,
         submitOrder,
@@ -104,7 +101,6 @@ CheckoutContainer.propTypes = {
             street: array,
             telephone: string
         }),
-        editing: oneOf(['address', 'paymentMethod', 'shippingMethod']),
         incorrectAddressMessage: string,
         isAddressIncorrect: bool,
         paymentCode: string,
@@ -136,7 +132,6 @@ CheckoutContainer.propTypes = {
     directory: shape({
         countries: array
     }),
-    editOrder: func,
     submitShippingAddress: func,
     submitOrder: func,
     submitPaymentMethodAndBillingAddress: func,
@@ -156,7 +151,6 @@ const mapStateToProps = ({ cart, checkout, directory, user }) => ({
 const mapDispatchToProps = {
     beginCheckout,
     cancelCheckout,
-    editOrder,
     submitShippingAddress,
     submitOrder,
     submitPaymentMethodAndBillingAddress,

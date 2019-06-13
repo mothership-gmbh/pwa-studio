@@ -1,5 +1,5 @@
-import React, { useCallback, Fragment } from 'react';
-import { array, bool, func, object, oneOf, shape, string } from 'prop-types';
+import React, { Fragment, useCallback, useState } from 'react';
+import { array, bool, func, object, shape, string } from 'prop-types';
 
 import { Price } from '@magento/peregrine';
 import AddressForm from './addressForm';
@@ -15,7 +15,7 @@ const isSubmitDisabled = (busy, valid) => busy || !valid;
 const EditableForm = props => {
     const {
         editing,
-        editOrder,
+        setEditing,
         submitShippingAddress,
         submitShippingMethod,
         submitPaymentMethodAndBillingAddress,
@@ -26,34 +26,37 @@ const EditableForm = props => {
     } = props;
 
     const handleCancel = useCallback(() => {
-        editOrder(null);
-    }, [editOrder]);
+        setEditing(null);
+    }, [setEditing]);
 
     const handleSubmitAddressForm = useCallback(
-        formValues => {
-            submitShippingAddress({
+        async formValues => {
+            await submitShippingAddress({
                 type: 'shippingAddress',
                 formValues
             });
+            setEditing(null);
         },
         [submitShippingAddress]
     );
 
     const handleSubmitPaymentsForm = useCallback(
-        formValues => {
-            submitPaymentMethodAndBillingAddress({
+        async formValues => {
+            await submitPaymentMethodAndBillingAddress({
                 formValues
             });
+            setEditing(null);
         },
         [submitPaymentMethodAndBillingAddress]
     );
 
     const handleSubmitShippingForm = useCallback(
-        formValues => {
-            submitShippingMethod({
+        async formValues => {
+            await submitShippingMethod({
                 type: 'shippingMethod',
                 formValues
             });
+            setEditing(null);
         },
         [submitShippingMethod]
     );
@@ -182,7 +185,7 @@ const Overview = props => {
         cart,
         cancelCheckout,
         classes,
-        editOrder,
+        setEditing,
         hasPaymentMethod,
         hasShippingAddress,
         hasShippingMethod,
@@ -199,16 +202,16 @@ const Overview = props => {
     }, [cancelCheckout]);
 
     const handleAddressFormClick = useCallback(() => {
-        editOrder('address');
-    }, [editOrder]);
+        setEditing('address');
+    }, [setEditing]);
 
     const handlePaymentFormClick = useCallback(() => {
-        editOrder('paymentMethod');
-    }, [editOrder]);
+        setEditing('paymentMethod');
+    }, [setEditing]);
 
     const handleShippingFormClick = useCallback(() => {
-        editOrder('shippingMethod');
-    }, [editOrder]);
+        setEditing('shippingMethod');
+    }, [setEditing]);
 
     return (
         <Fragment>
@@ -271,11 +274,24 @@ const Overview = props => {
 
 const Form = props => {
     const classes = mergeClasses(defaultClasses, props.classes);
+
+    const [editing, setEditing] = useState(null);
     let child;
-    if (props.editing) {
-        child = <EditableForm {...props} />;
+    if (editing) {
+        const editableFormProps = {
+            editing,
+            setEditing,
+            ...props
+        };
+        child = <EditableForm {...editableFormProps} />;
     } else {
-        child = <Overview classes={classes} {...props} />;
+        const overviewProps = {
+            classes,
+            editing,
+            setEditing,
+            ...props
+        };
+        child = <Overview {...overviewProps} />;
     }
 
     return <div className={classes.root}>{child}</div>;
@@ -314,8 +330,6 @@ Form.propTypes = {
         paymentDisplaySecondary: string,
         root: string
     }),
-    editing: oneOf(['address', 'paymentMethod', 'shippingMethod']),
-    editOrder: func.isRequired,
     hasPaymentMethod: bool,
     hasShippingAddress: bool,
     hasShippingMethod: bool,

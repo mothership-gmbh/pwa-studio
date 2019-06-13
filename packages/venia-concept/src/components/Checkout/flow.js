@@ -26,7 +26,6 @@ const Flow = props => {
     const {
         beginCheckout,
         cancelCheckout,
-        editOrder,
         submitShippingAddress,
         submitOrder,
         submitPaymentMethodAndBillingAddress,
@@ -36,7 +35,6 @@ const Flow = props => {
     const {
         availableShippingMethods,
         billingAddress,
-        editing,
         isAddressIncorrect,
         incorrectAddressMessage,
         paymentData,
@@ -67,8 +65,6 @@ const Flow = props => {
                 cancelCheckout,
                 cart,
                 directory,
-                editOrder,
-                editing,
                 hasPaymentMethod,
                 hasShippingAddress,
                 hasShippingMethod,
@@ -109,7 +105,6 @@ Flow.propTypes = {
     actions: shape({
         beginCheckout: func,
         cancelCheckout: func,
-        editOrder: func,
         submitShippingAddress: func,
         submitOrder: func,
         submitPaymentMethodAndBillingAddress: func,
@@ -135,7 +130,6 @@ Flow.propTypes = {
             street: array,
             telephone: string
         }),
-        editing: oneOf(['address', 'paymentMethod', 'shippingMethod']),
         incorrectAddressMessage: string,
         isAddressIncorrect: bool,
         paymentCode: string,
