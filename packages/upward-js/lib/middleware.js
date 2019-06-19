@@ -87,12 +87,9 @@ class UpwardMiddleware {
             } else {
                 debug('status, headers, and body valid. responding');
                 res.status(response.status)
-                    .set(response.headers)
-                    .send(
-                        typeof response.body === 'string'
-                            ? response.body
-                            : response.body.toString()
-                    );
+                    .set(response.headers);
+                res.body = typeof response.body === 'string' ? response.body : response.body.toString();
+                next();
             }
         };
     }
