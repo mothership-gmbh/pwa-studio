@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { bool, func, shape, string } from 'prop-types';
 import { Form } from 'informed';
-import { useDropdown } from '@magento/peregrine';
+import { useDropdown } from '@magento/peregrine/asdf';
 
 import { mergeClasses } from 'src/classify';
 import Autocomplete from './autocomplete';
