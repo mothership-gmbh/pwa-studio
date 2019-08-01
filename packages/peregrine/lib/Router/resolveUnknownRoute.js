@@ -10,7 +10,7 @@ const numRE = /^\d+$/;
 const castDigitsToNum = str =>
     typeof str === 'string' && numRE.test(str) ? Number(str) : str;
 export default async function resolveUnknownRoute(opts) {
-    const { route, apiBase } = opts;
+    const { route, apiBase, customHeaders = new Headers() } = opts;
 
     if (!resolveUnknownRoute.preloadDone) {
         resolveUnknownRoute.preloadDone = true;
@@ -51,13 +51,14 @@ export default async function resolveUnknownRoute(opts) {
 
     return remotelyResolveRoute({
         route,
-        apiBase
+        apiBase,
+        customHeaders
     });
 }
 
 /**
  * @description Checks if route is stored in localStorage, if not call `fetchRoute`
- * @param {{ route: string, apiBase: string}} opts
+ * @param {{ route: string, apiBase: string, customHeaders: Headers}} opts
  * @returns {Promise<{type: "PRODUCT" | "CATEGORY" | "CMS_PAGE"}>}
  */
 function remotelyResolveRoute(opts) {
@@ -83,21 +84,20 @@ function remotelyResolveRoute(opts) {
 
 /**
  * @description Calls the GraphQL API for results from the urlResolver query
- * @param {{ route: string, apiBase: string}} opts
+ * @param {{ route: string, apiBase: string, customHeaders: Headers}} opts
  * @returns {Promise<{type: "PRODUCT" | "CATEGORY" | "CMS_PAGE"}>}
  */
 function fetchRoute(opts) {
-    const url = new URL('/graphql', opts.apiBase);
+    const { route, apiBase, customHeaders } = opts;
+    const url = new URL('/graphql', apiBase);
     return fetch(url, {
         method: 'POST',
         credentials: 'include',
-        headers: new Headers({
-            'Content-Type': 'application/json'
-        }),
+        headers: withDefaultHeaders(customHeaders),
         body: JSON.stringify({
             query: `
                 {
-                    urlResolver(url: "${opts.route}") {
+                    urlResolver(url: "${route}") {
                         type
                         id
                     }
@@ -110,6 +110,29 @@ function fetchRoute(opts) {
             storeURLResolveResult(res, opts);
             return res.data.urlResolver;
         });
+}
+
+/**
+ * Merge default headers with custom headers.
+ * @param customHeaders: Headers
+ * @returns {Headers}
+ */
+function withDefaultHeaders(customHeaders) {
+    const headers = new Headers({
+        'Content-Type': 'application/json'
+    });
+    if (customHeaders instanceof Headers) {
+        for (const [key, value] of customHeaders.entries()) {
+            // To be able to overwrite values we need to use set instead of append
+            headers.set(key, value);
+        }
+    } else {
+        console.warn(
+            'Custom headers have to be an instance of Headers. Using only default headers.'
+        );
+    }
+
+    return headers;
 }
 
 // TODO: This can be handled by workbox once this issue is resolved in the
