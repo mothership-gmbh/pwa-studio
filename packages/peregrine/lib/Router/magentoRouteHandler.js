@@ -16,7 +16,8 @@ export default class MagentoRouteHandler extends Component {
         children: func,
         location: shape({
             pathname: string.isRequired
-        }).isRequired
+        }).isRequired,
+        storeCode: string
     };
 
     state = {
@@ -87,11 +88,16 @@ export default class MagentoRouteHandler extends Component {
                 : fetchRootComponent;
 
         try {
+            const customHeaders = new Headers();
+            if (this.props.storeCode) {
+                customHeaders.append('Store', this.props.storeCode);
+            }
             // try to resolve the route
             // if this throws, we essentially have a 500 Internal Error
             const resolvedRoute = await resolveUnknownRoute({
                 apiBase,
-                route: pathname
+                route: pathname,
+                customHeaders: customHeaders
             });
 
             const { type, id } = resolvedRoute;
